@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilimlar bellashuvi</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;padding:18px;
+ display:flex;align-items:center;justify-content:center;
+ font-family:Arial,sans-serif;color:#fff;
+ background:linear-gradient(135deg,#071525,#132c43,#203b50);
+}
+.container{
+ width:100%;max-width:850px;
+ background:#14283c;border:1px solid #455c70;
+ border-radius:22px;padding:28px;
+ box-shadow:0 15px 50px #0008;
+}
+.hidden{display:none!important}
+h1{text-align:center;color:#e6c27d;font-size:30px}
+h2{text-align:center;color:#e6c27d}
+.subtitle{
+ text-align:center;color:#c1ccd6;
+ line-height:1.9;font-size:17px;
+}
+.gold{color:#e6c27d}
+button{
+ cursor:pointer;border:0;border-radius:11px;
+ padding:14px 20px;font-size:15px;font-weight:bold;
+ transition:.2s;
+}
+button:hover{filter:brightness(1.15);transform:translateY(-2px)}
+.primary{background:#d9b46e;color:#172638}
+.secondary{background:#344c62;color:white}
+.start{
+ display:block;margin:35px auto 5px;
+ padding:17px 55px;font-size:19px;
+}
+.timer{
+ color:#e6c27d;font-size:23px;font-weight:bold;
+}
+.timer.danger{color:#ff7777}
+.top{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;
+}
+.progress{
+ height:8px;background:#34485b;
+ border-radius:20px;overflow:hidden;margin:20px 0;
+}
+.progress div{
+ height:100%;background:#d9b46e;
+ transition:width .3s;
+}
+.teams{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:12px;margin:20px 0;
+}
+.team{
+ background:#263e54;color:#fff;
+ border:1px solid #586f84;
+}
+.team.selected{
+ border:2px solid #e6c27d;
+ background:#40566c;
+}
+.question{
+ font-size:21px;line-height:1.6;
+ margin:25px 0;
+}
+.options{display:grid;gap:12px}
+.option{
+ width:100%;text-align:left;
+ background:#263d53;color:white;
+ border:1px solid #526b80;
+ padding:16px;border-radius:12px;
+ font-size:16px;line-height:1.5;
+}
+.option.correct{background:#17684e;border-color:#65d5a8}
+.option.wrong{background:#853d46;border-color:#ff9999}
+.option:disabled{cursor:default}
+.feedback{
+ text-align:center;font-size:21px;
+ font-weight:bold;margin:20px 0;min-height:45px;
+}
+.emoji{font-size:48px;display:block;margin:10px}
+.pop{animation:pop .5s ease}
+@keyframes pop{
+ 0%{transform:scale(.5);opacity:0}
+ 70%{transform:scale(1.15)}
+ 100%{transform:scale(1);opacity:1}
+}
+.navigation{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-top:25px;gap:10px;
+}
+.navbtn{background:#344c62;color:white;font-size:23px}
+.small{font-size:13px;color:#b5c3cf;text-align:center}
+.scoreboard{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:15px;margin:25px 0;
+}
+.score{
+ background:#263d53;padding:20px;
+ text-align:center;border-radius:15px;
+ border:1px solid #60758a;
+}
+.score strong{font-size:34px;color:#e6c27d}
+.winner{text-align:center;font-size:22px;line-height:1.8}
+.thanks{
+ margin-top:30px;padding-top:20px;
+ border-top:1px solid #50657a;
+ text-align:center;color:#e6c27d;line-height:1.9;
+}
+@media(max-width:550px){
+ .container{padding:18px}
+ h1{font-size:24px}
+ .question{font-size:18px}
+ .option{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- BOSHLANG'ICH OYNA -->
+<section id="home">
+<h1>BILIMLAR BELLASHUVI</h1>
+
+<p class="subtitle">
+<strong class="gold">128-25 guruh talabalari</strong><br>
+Nabiev Sarvarjon va Jo‘raboyev Jamshidbekning<br>
+bugungi dars uchun tayyorlagan savollari
+</p>
+
+<p class="subtitle">
+20 ta murakkab savol<br>
+Har bir savol uchun 60 soniya
+</p>
+
+<button class="primary start" onclick="startGame()">
+▶ BOSHLASH
+</button>
+</section>
+
+<!-- SAVOLLAR OYNASI -->
+<section id="quiz" class="hidden">
+
+<div class="top">
+<span id="counter" class="gold">Savol 1 / 20</span>
+<span id="timer" class="timer">01:00</span>
+</div>
+
+<div class="progress"><div id="bar"></div></div>
+
+<div class="teams">
+<button class="team selected" id="team0" onclick="chooseTeam(0)">
+1-GURUH
+</button>
+<button class="team" id="team1" onclick="chooseTeam(1)">
+2-GURUH
+</button>
+</div>
+
+<div id="question" class="question"></div>
+<div id="options" class="options"></div>
+<div id="feedback" class="feedback"></div>
+
+<div class="navigation">
+<button class="navbtn" onclick="previous()">←</button>
+<span class="small">OLDINGI / KEYINGI SAVOL</span>
+<button class="navbtn" onclick="next()">→</button>
+</div>
+
+</section>
+
+<!-- NATIJALAR -->
+<section id="result" class="hidden">
+<h1>🏆 BELLASHUV YAKUNI</h1>
+<p class="subtitle">Natijalar avtomatik hisoblandi!</p>
+
+<div class="scoreboard">
+<div class="score">
+<h3>1-GURUH</h3>
+<strong id="score0">0</strong>
+<p>ball</p>
+</div>
+<div class="score">
+<h3>2-GURUH</h3>
+<strong id="score1">0</strong>
+<p>ball</p>
+</div>
+</div>
+
+<div id="winner" class="winner"></div>
+
+<div class="thanks">
+Darslarni qiziqarli va tushunarli olib borayotganlari uchun
+<br>
+<strong>Nodirbek Valiyevga rahmat!</strong>
+</div>
+
+<button class="primary start" onclick="location.reload()">
+QAYTA BOSHLASH
+</button>
+</section>
+
+</div>
+
+<script>
+const questions=[
+
+{
+q:"1. To‘qimachilik tolalarining kelib chiqishi va kimyoviy tarkibiga ko‘ra tasniflanishida qaysi yondashuv ilmiy jihatdan to‘g‘ri?",
+a:[
+"Tabiiy tolalar faqat o‘simliklardan olinadi, kimyoviy tolalar esa faqat sintetik polimerlardan ishlab chiqariladi.",
+"Tolalar tabiiy va kimyoviy guruhlarga, kimyoviy tolalar esa sun’iy va sintetik guruhlarga ajratiladi.",
+"Barcha tabiiy tolalar oqsil tarkibli, barcha kimyoviy tolalar sellyuloza tarkiblidir.",
+"Tolalar faqat uzunligi va yo‘g‘onligiga qarab sinflanadi."
+],c:1,e:"Kimyoviy tolalar sun’iy va sintetik guruhlarga ajratiladi. Tabiiy tolalar esa o‘simlik, hayvon va mineral kelib chiqishga ega."
+},
+
+{
+q:"2. Elementar tola va texnik tola tushunchalarining asosiy farqi qaysi javobda to‘g‘ri ifodalangan?",
+a:[
+"Elementar tola bir nechta mustaqil tolalarning birikmasi, texnik tola esa bitta molekuladan tashkil topadi.",
+"Ular faqat rang jihatidan farqlanadi.",
+"Elementar tola alohida tolali birlik, texnik tola esa bir nechta elementar tolalarning birikmasidan tashkil topishi mumkin.",
+"Texnik tola faqat kimyoviy tolalarga xos."
+],c:2,e:"Elementar tola alohida tolali birlik hisoblanadi. Texnik tolalar esa elementar tolalarning birikishi natijasida shakllanishi mumkin."
+},
+
+{
+q:"3. Viskoza, asetat va kapron tolalarini olish usuli hamda xomashyo xususiyatiga ko‘ra to‘g‘ri guruhlang.",
+a:[
+"Viskoza va asetat — sun’iy, kapron — sintetik.",
+"Viskoza — sintetik, asetat — tabiiy, kapron — sun’iy.",
+"Uchchalasi ham tabiiy tola.",
+"Viskoza — sintetik, asetat va kapron — tabiiy."
+],c:0,e:"Viskoza va asetat tabiiy polimer sellyuloza asosida olinadigan sun’iy tolalar, kapron esa sintetik polimer tolasidir."
+},
+
+{
+q:"4. Tolani alanga ta’sirida aniqlashda faqat alangadagi rangga asoslanib xulosa chiqarish nima sababdan noto‘g‘ri?",
+a:[
+"Alanga rangi faqat tolaning uzunligini ko‘rsatadi.",
+"Turli tolalar o‘xshash yonish belgilarini namoyon qilishi mumkin, shu sababli boshqa belgilar ham tekshiriladi.",
+"Alanga rangi namlikka umuman bog‘liq emas.",
+"Yonish jarayonida barcha tolalar bir xil hid chiqaradi."
+],c:1,e:"Tola turini aniqlashda alangaga kirishi, yonishi, alangadan chiqarilgandagi holati, hidi va qoldig‘i birgalikda baholanadi."
+},
+
+{
+q:"5. Oqsil tabiatli jun tolasi yonish jarayonida qoldiq hosil qilganda qaysi belgi ko‘proq kuzatiladi?",
+a:[
+"Qattiq shishasimon sharcha hosil qiladi.",
+"Erib, tiniq plastmassa tomchiga aylanadi.",
+"Mo‘rt, qoramtir, oson uvalanadigan qoldiq hosil qiladi.",
+"Umuman qoldiq hosil qilmaydi."
+],c:2,e:"Jun oqsil tabiatli tola bo‘lib, yonishdan so‘ng qoramtir, mo‘rt qoldiq hosil qilishi mumkin."
+},
+
+{
+q:"6. Termoplastik sintetik tolalarning alanga ta’sirida o‘zini tutishiga xos belgi qaysi?",
+a:[
+"Yonishdan oldin yumshashi va erishi mumkin.",
+"Har doim ko‘mirga aylanadi.",
+"Yonish vaqtida hech qanday o‘zgarish kuzatilmaydi.",
+"Faqat kul hosil qiladi."
+],c:0,e:"Ko‘plab termoplastik sintetik tolalar qizdirilganda yumshaydi va eriydi."
+},
+
+{
+q:"7. Paxta namligini aniqlashda boshlang‘ich va quritilgan massa orasidagi farq nimani ifodalaydi?",
+a:[
+"Paxtaning tolalar uzunligini.",
+"Namuna tarkibidan ajralgan namlik miqdorini.",
+"Paxtadagi chigit sonini.",
+"Tolaning buramdorligini."
+],c:1,e:"Namuna quritilgunga qadar va quritilgandan keyingi massalar farqi yo‘qotilgan namlik miqdorini ko‘rsatadi."
+},
+
+{
+q:"8. Namlikni aniqlashda namuna quritilgandan keyin doimiy massaga keltirilishining asosiy maqsadi nima?",
+a:[
+"Namuna rangini o‘zgartirish.",
+"Namuna uzunligini bir xil qilish.",
+"Quritish davomida massa o‘zgarishi deyarli to‘xtaganini tasdiqlash.",
+"Namuna tarkibidagi barcha tolalarni ajratish."
+],c:2,e:"Doimiy massa namlikning yetarlicha chiqarilganini va o‘lchash natijasining barqarorligini baholashga yordam beradi."
+},
+
+{
+q:"9. Paxta namligini aniqlashda namunaning noto‘g‘ri saqlanishi qanday xatolikka olib keladi?",
+a:[
+"Namunaning namligi atrof-muhit bilan namlik almashinuvi sabab o‘zgarishi mumkin.",
+"Faqat namunaning rangi o‘zgaradi.",
+"Namuna tolalari kimyoviy jihatdan paxtaga aylanadi.",
+"Namlik natijasi har doim nolga tenglashadi."
+],c:0,e:"Paxta atrof-muhit namligini yutishi yoki yo‘qotishi mumkin. Shuning uchun saqlash sharoiti muhim."
+},
+
+{
+q:"10. Namunaviy pilik va natijaviy pilikni tayyorlashda dastlabki namuna olishdan ko‘zlangan asosiy maqsad nima?",
+a:[
+"Faqat tolalarni rangiga qarab saralash.",
+"Sinov natijalarini butun partiyaning xususiyatlarini ifodalashga imkon beradigan darajada reprezentativ qilish.",
+"Faqat eng uzun tolalarni ajratish.",
+"Pilikning tashqi ko‘rinishini bezash."
+],c:1,e:"Reprezentativ namuna butun tekshirilayotgan paxta massasining xususiyatlarini imkon qadar to‘g‘ri ifodalashi kerak."
+},
+
+{
+q:"11. Namuna tayyorlash jarayonida tolalarning ortiqcha yo‘qotilishi qanday metodik muammoga sabab bo‘ladi?",
+a:[
+"Namuna tarkibining dastlabki partiyaga nisbatan o‘zgarishiga.",
+"Namunaning har doim og‘irlashishiga.",
+"Tola tarkibidagi namlikning mutlaqo yo‘qolishiga.",
+"Sinov natijalarining avtomatik ravishda yaxshilanishiga."
+],c:0,e:"Ayrim tolalarning tanlab yo‘qotilishi namuna tarkibini o‘zgartirib, natijalarni noto‘g‘ri aks ettirishi mumkin."
+},
+
+{
+q:"12. Paxta tolasining shikastlanishi sifat ko‘rsatkichlariga qaysi holatda jiddiy ta’sir ko‘rsatadi?",
+a:[
+"Faqat tolaning tabiiy rangiga ta’sir qilganda.",
+"Tola uzunligi va mustahkamligi bilan bog‘liq tuzilish buzilganda.",
+"Faqat namuna yorlig‘i o‘zgarganda.",
+"Faqat tola tashqi tomondan tekislanganda."
+],c:1,e:"Shikastlanish tola tuzilishi, uzunligi va uzilish xususiyatlariga salbiy ta’sir ko‘rsatishi mumkin."
+},
+
+{
+q:"13. Paxta tolasida tugunchalar va tolali nuqsonlar miqdorining ortishi ip yigirish jarayonida qanday oqibatga olib kelishi mumkin?",
+a:[
+"Faqat ipning rangini yaxshilaydi.",
+"Yigirish jarayonidagi uzilishlar va ip notekisligi ortishi mumkin.",
+"Har qanday holatda ip mustahkamligi ortadi.",
+"Nuqsonlar ip sifatiga ta’sir qilmaydi."
+],c:1,e:"Tola nuqsonlari ipning bir tekisligi, tashqi ko‘rinishi va texnologik jarayon barqarorligiga ta’sir ko‘rsatadi."
+},
+
+{
+q:"14. Tola shikastlanishini aniqlashda namuna tayyorlash va mikroskopik kuzatish o‘rtasidagi bog‘liqlik qanday?",
+a:[
+"Namuna tayyorlash kuzatish natijasiga ta’sir qilmaydi.",
+"Noto‘g‘ri tayyorlangan namuna shikastlanish belgilarini noto‘g‘ri baholashga olib kelishi mumkin.",
+"Mikroskop faqat namlikni aniqlaydi.",
+"Namuna faqat qizdirilgandan keyin tekshiriladi."
+],c:1,e:"Namunaning to‘g‘ri tayyorlanishi tolalarning tabiiy holatini saqlash va nuqsonlarni to‘g‘ri aniqlash uchun zarur."
+},
+
+{
+q:"15. Paxta tolasining buramdorligi deganda qanday strukturaviy xususiyat tushuniladi?",
+a:[
+"Tolaning uzunligi bo‘ylab tabiiy buralish va buramlar hosil qilishi.",
+"Tolaning faqat ko‘ndalang kesimi.",
+"Tolaning rang pigmentlari miqdori.",
+"Tolaning namlikni yutish tezligi."
+],c:0,e:"Buramdorlik paxta tolasining uzunligi bo‘ylab shakllanadigan tabiiy buralishlar bilan bog‘liq."
+},
+
+{
+q:"16. Paxta tolasining buramdorligini baholashda buramlar soni va ularning taqsimlanishini birgalikda o‘rganish nima uchun muhim?",
+a:[
+"Faqat tola rangini aniqlash uchun.",
+"Buramdorlikning strukturaviy xususiyatlarini to‘liqroq baholash uchun.",
+"Namunaning massasini ko‘paytirish uchun.",
+"Tolaning kimyoviy tarkibini o‘zgartirish uchun."
+],c:1,e:"Buramlarning soni bilan birga taqsimlanishi ham tolaning morfologik xususiyatlarini baholashda ahamiyatli."
+},
+
+{
+q:"17. Klassyor usulida paxta tolasining sifatini baholashda qaysi yondashuv eng to‘g‘ri hisoblanadi?",
+a:[
+"Faqat rangiga qarab yakuniy sifatni belgilash.",
+"Faqat namlik ko‘rsatkichiga qarab baholash.",
+"Tola rangi, tashqi ko‘rinishi, ifloslanganligi, nuqsonlari va boshqa sifat belgilarini kompleks baholash.",
+"Faqat tolaning massasini o‘lchash."
+],c:2,e:"Klassyor usulida bir nechta sifat belgilari kompleks tarzda baholanadi."
+},
+
+{
+q:"18. Klassyor baholashida namunaning ifloslanganligi va nuqsonlarini hisobga olmaslik qanday xatoga olib kelishi mumkin?",
+a:[
+"Paxta sifatining haqiqiy holati noto‘g‘ri baholanishiga.",
+"Faqat namunaning uzunligi o‘zgarishiga.",
+"Namlikning avtomatik kamayishiga.",
+"Tola tarkibidagi sellyuloza miqdorining ortishiga."
+],c:0,e:"Ifloslik va nuqsonlar paxtaning sifatiga bevosita ta’sir qiluvchi belgilar hisoblanadi."
+},
+
+{
+q:"19. Klassyor usulida baholash bilan laboratoriya asbob-uskunalarida o‘tkaziladigan sinovlar o‘rtasidagi asosiy farq qaysi?",
+a:[
+"Klassyor usuli faqat kimyoviy tarkibni aniqlaydi.",
+"Har ikkala usul mutlaqo bir xil o‘lchash prinsipiga ega.",
+"Klassyor usuli mutaxassisning standartlashtirilgan vizual va organoleptik bahosiga, laboratoriya sinovlari esa asbobiy o‘lchashlarga asoslanadi.",
+"Laboratoriya sinovlarida namuna ishlatilmaydi."
+],c:2,e:"Klassyor bahosi tashqi belgilar va mutaxassis bahosiga asoslanadi, laboratoriya sinovlari esa aniq ko‘rsatkichlarni o‘lchaydi."
+},
+
+{
+q:"20. Paxta tolasining sifatini yakuniy baholashda bir nechta ko‘rsatkichlarning o‘zaro muvofiqligini tekshirish nima uchun zarur?",
+a:[
+"Faqat hujjatlarni ko‘paytirish uchun.",
+"Bir ko‘rsatkich boshqa ko‘rsatkichlarning o‘rnini har doim to‘liq bosishi uchun.",
+"Mahsulotning haqiqiy sifat darajasini kompleks aniqlash uchun.",
+"Faqat tolaning uzunligini kamaytirish uchun."
+],c:2,e:"Sifat ko‘rsatkichlari o‘zaro bog‘liq. Kompleks baholash paxtaning haqiqiy sifat darajasini to‘g‘ri aniqlash imkonini beradi."
+}
+
+];
+
+let current=0;
+let scores=[0,0];
+let selectedTeam=0;
+let answers={};
+let interval=null;
+let advanceTimeout=null;
+let remaining=60;
+let finished=false;
+
+const $=id=>document.getElementById(id);
+
+function sound(correct){
+ try{
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type="sine";
+  osc.frequency.value=correct?880:190;
+  gain.gain.value=.12;
+  osc.start();
+  osc.frequency.exponentialRampToValueAtTime(
+   correct?1250:100,ctx.currentTime+.35
+  );
+  gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.4);
+  osc.stop(ctx.currentTime+.4);
+ }catch(e){}
+}
+
+function stopTimer(){
+ clearInterval(interval);
+ clearTimeout(advanceTimeout);
+}
+
+function startGame(){
+ $('home').classList.add('hidden');
+ $('quiz').classList.remove('hidden');
+ current=0;
+ scores=[0,0];
+ answers={};
+ selectedTeam=0;
+ finished=false;
+ chooseTeam(0);
+ render();
+}
+
+function chooseTeam(n){
+ selectedTeam=n;
+ $('team0').classList.toggle('selected',n===0);
+ $('team1').classList.toggle('selected',n===1);
+}
+
+function updateTimer(){
+ $('timer').textContent="00:"+String(remaining).padStart(2,'0');
+ $('timer').classList.toggle('danger',remaining<=10);
+}
+
+function startTimer(){
+ stopTimer();
+ remaining=60;
+ updateTimer();
+
+ interval=setInterval(()=>{
+  remaining--;
+  updateTimer();
+
+  if(remaining<=0){
+   stopTimer();
+   if(!answers[current])timeOut();
+  }
+ },1000);
+}
+
+function render(){
+ if(finished)return;
+ stopTimer();
+
+ const item=questions[current];
+ const saved=answers[current];
+
+ $('counter').textContent=`Savol ${current+1} / 20`;
+ $('bar').style.width=((current+1)/20*100)+"%";
+ $('question').textContent=item.q;
+ $('feedback').innerHTML="";
+ $('options').innerHTML="";
+
+ item.a.forEach((option,i)=>{
+  const btn=document.createElement('button');
+  btn.className='option';
+  btn.textContent=String.fromCharCode(65+i)+". "+option;
+
+  if(saved){
+   btn.disabled=true;
+   if(i===item.c)btn.classList.add('correct');
+   if(i===saved.choice && !saved.correct)
+    btn.classList.add('wrong');
+  }else{
+   btn.onclick=()=>answer(i);
+  }
+
+  $('options').appendChild(btn);
+ });
+
+ if(saved){
+  $('feedback').innerHTML=
+   `<span class="emoji">${saved.correct?'🏆':'❌'}</span>`+
+   (saved.correct?'TO‘G‘RI JAVOB!':'NOTO‘G‘RI JAVOB!')+
+   `<div class="small">${item.e}</div>`;
+  chooseTeam(saved.team);
+ }else{
+  startTimer();
+ }
+}
+
+function answer(index){
+ if(answers[current]||finished)return;
+
+ stopTimer();
+ const item=questions[current];
+ const correct=index===item.c;
+
+ answers[current]={
+  choice:index,
+  correct:correct,
+  team:selectedTeam
+ };
+
+ if(correct)scores[selectedTeam]++;
+
+ sound(correct);
+
+ const buttons=$('options').querySelectorAll('button');
+ buttons.forEach((btn,i)=>{
+  btn.disabled=true;
+  if(i===item.c)btn.classList.add('correct');
+  if(i===index&&!correct)btn.classList.add('wrong');
+ });
+
+ $('feedback').innerHTML=
+ `<div class="pop">
+ <span class="emoji">${correct?'🎉🏆':'❌😅'}</span>
+ ${correct?'BARAKALLA! TO‘G‘RI JAVOB!':'AFSUS, NOTO‘G‘RI JAVOB!'}
+ <div class="small">${item.e}</div>
+ </div>`;
+
+ advanceTimeout=setTimeout(()=>{
+  if(current<19){
+   current++;
+   render();
+  }else{
+   finish();
+  }
+ },2500);
+}
+
+function timeOut(){
+ if(answers[current]||finished)return;
+
+ $('feedback').innerHTML=
+ '<div class="pop"><span class="emoji">⏰</span>VAQT TUGADI!</div>';
+
+ advanceTimeout=setTimeout(()=>{
+  if(current<19){
+   current++;
+   render();
+  }else{
+   finish();
+  }
+ },1200);
+}
+
+function previous(){
+ if(current>0){
+  stopTimer();
+  current--;
+  render();
+ }
+}
+
+function next(){
+ stopTimer();
+
+ if(current<19){
+  current++;
+  render();
+ }else{
+  finish();
+ }
+}
+
+function finish(){
+ stopTimer();
+ finished=true;
+
+ $('quiz').classList.add('hidden');
+ $('result').classList.remove('hidden');
+
+ $('score0').textContent=scores[0];
+ $('score1').textContent=scores[1];
+
+ if(scores[0]>scores[1]){
+  $('winner').innerHTML=
+  `🏆 TABRIKLAYMIZ!<br>
+  <span class="gold">1-GURUH G‘OLIB!</span><br>
+  Sizlar bilim, faollik va hamjihatlik bilan
+  munosib g‘alabaga erishdingiz!`;
+ }
+ else if(scores[1]>scores[0]){
+  $('winner').innerHTML=
+  `🏆 TABRIKLAYMIZ!<br>
+  <span class="gold">2-GURUH G‘OLIB!</span><br>
+  Sizlar bilim, faollik va hamjihatlik bilan
+  munosib g‘alabaga erishdingiz!`;
+ }
+ else{
+  $('winner').innerHTML=
+  `🤝 DURANG!<br>
+  <span class="gold">HAR IKKALA GURUH HAM G‘OLIB!</span><br>
+  Bugun ikkala guruh ham ajoyib bilim va faollik namoyish etdi!`;
+ }
+
+ sound(true);
+}
+</script>
+
+</body>
+</html>
